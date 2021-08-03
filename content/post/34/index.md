@@ -2,8 +2,8 @@
 title = "Python 3.7になったGoogle ColabでCASAを動かしてみる"
 description = "2021年4月時点ではプレリリース版CASAのインストールが必要です"
 date = 2021-04-10T12:18:00+09:00
-tags = ["CASA", "Google", "Colab"]
-categories = ["Astronomy", "Python"]
+tags = ["Python", "CASA", "Google", "Colab"]
+categories = ["Astronomy"]
 image = "cover.jpg"
 +++
 
