@@ -30,7 +30,7 @@ border = withStroke(linewidth=3, foreground="white")
 
 ## Examples
 
-ボーダーを追加するには、作成したpath effectオブジェクトを（1）rcParamsでグローバルに設定するか、（2）プロット関連の関数やメソッドが持つ`path_effect`オプションで個別に設定するか、（3）表示要素）が持つ`set_path_effects()`メソッドで個別に設定します。
+ボーダーを追加するには、作成したpath effectオブジェクトを（1）rcParamsでグローバルに設定するか、（2）プロット関連の関数やメソッドが持つ`path_effect`オプションで個別に設定するか、（3）表示要素が持つ`set_path_effects()`メソッドで個別に設定します。
 以下では（1）の例を紹介します。
 
 ```python
