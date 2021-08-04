@@ -39,6 +39,8 @@ with plt.rc_context({"path.effects": [border]}):
     plt.plot([2, 1, 3, 2], label="B")
     plt.title("Darkmode-compatible figure")
     plt.legend()
+
+plt.savefig("figure.png", transparent=True)
 ```
 
 `rc_context()`を使うと、withブロックに書かれた要素のみにボーダーを適用することができます。
@@ -56,6 +58,8 @@ with plt.rc_context({"path.effects": [border]}):
     ax.plot([2, 1, 3, 2], label="B")
     ax.set_title("Darkmode-compatible figure")
     ax.legend()
+
+fig.savefig("figure.png", transparent=True)
 ```
 
 ## References
