@@ -48,18 +48,15 @@ with plt.rc_context({"path.effects": [border]}):
 少し複雑になりますが、以下のように書くことで外周のボーダーを消すことができます。
 
 ```python
+fig = plt.figure()
+
 with plt.rc_context({"path.effects": [border]}):
-    fig, ax = plt.subplots()
+    ax = fig.add_subplot()
     ax.plot([1, 2, 1, 3], label="A")
     ax.plot([2, 1, 3, 2], label="B")
     ax.set_title("Darkmode-compatible figure")
     ax.legend()
-
-fig.patch.set_path_effects([])
 ```
-
-最後の行は（3）を使って、空のpath effectsを再設定しています。
-
 
 ## References
 
