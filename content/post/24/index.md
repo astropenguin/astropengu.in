@@ -6,7 +6,7 @@ categories  = ["Tech"]
 aliases = ["/blog/24/"]
 +++
 
-## TL;DR :christmas_tree:
+## TL;DR
 
 これはアドベントカレンダーの18日目の記事です。
 だいぶ日が開いてしまいましたが、[前回の続き](/blog/16/) として、Hugo で作成したウェブサイトを Travis CI で自動ビルド→プッシュするための設定を行います。

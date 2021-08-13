@@ -6,7 +6,7 @@ categories  = ["Tech"]
 aliases = ["/blog/25/"]
 +++
 
-## TL;DR :bamboo:
+## TL;DR
 
 タイムゾーンを扱う Python パッケージを開発した際に調べた情報をまとめておきます。
 そもそも Python におけるタイムゾーンは、tzinfo と呼ばれるオブジェクトによって表現されます。

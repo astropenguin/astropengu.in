@@ -6,7 +6,7 @@ categories = ["Tech"]
 aliases = ["/blog/13/"]
 +++
 
-## TL;DR :christmas_tree:
+## TL;DR
 
 これはアドベントカレンダーの7日目の記事です。
 今日は雑ですが、Slack のサイドバーのカスタムテーマ集のサイトの紹介と設定方法のメモです。

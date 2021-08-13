@@ -6,7 +6,7 @@ categories = ["Tech"]
 aliases = ["/blog/10/"]
 +++
 
-## TL;DR :christmas_tree:
+## TL;DR
 
 これはアドベントカレンダーの4日目の記事です。
 今日は Python で複数行のコードの実行時間を計測する際の書き方をまとめました。

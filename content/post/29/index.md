@@ -7,7 +7,7 @@ aliases = ["/blog/29/"]
 image = "image.jpg"
 +++
 
-## TL;DR :flags:
+## TL;DR
 
 [xarray]はラベル付き多次元配列のセットを扱うためのPythonパッケージで、[PyData]によって開発されています。
 Pythonにはもともと、多次元配列を効率的に扱うことのできる[NumPy]、ラベル付き1次元配列（系列データ）のセットを扱う[pandas]があり、xarrayはpandasの多次元版と考えることができます。

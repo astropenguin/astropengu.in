@@ -6,7 +6,7 @@ categories = ["Tech"]
 aliases = ["/blog/19/"]
 +++
 
-## TL;DR :christmas_tree:
+## TL;DR
 
 これはアドベントカレンダーの13日目の記事です。
 最近私の周りで non-LTE 放射輸送計算コード [RADEX](https://personal.sron.nl/~vdtak/radex/index.shtml) を使う人が増えてきたので、ビルドとインストールを GNU make や Homebrew で行えるようにしたという話です。

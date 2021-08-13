@@ -6,7 +6,7 @@ categories = ["Tech"]
 aliases = ["/blog/9/"]
 +++
 
-## TL;DR :christmas_tree:
+## TL;DR
 
 これはアドベントカレンダーの3日目の記事です。
 今日は雑ですが、[matplotlib](https://matplotlib.org/) のデフォルトスタイルを復元する方法のメモです。

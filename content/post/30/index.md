@@ -7,7 +7,7 @@ aliases = ["/blog/30/"]
 image = "image.jpg"
 +++
 
-## TL;DR :flags:
+## TL;DR
 
 Python の小ネタですが、dictionary で存在しない key にアクセスした際に送出される `KeyError` のメッセージに、存在する keys 一覧を表示させる方法をメモしておきます。
 

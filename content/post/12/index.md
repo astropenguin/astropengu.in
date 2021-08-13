@@ -6,7 +6,7 @@ categories = ["Tech"]
 aliases = ["/blog/12/"]
 +++
 
-## TL;DR :christmas_tree:
+## TL;DR
 
 これはアドベントカレンダーの6日目の記事です。
 今日は[昨日の続き](/blog/11)で、[Linuxbrew](http://linuxbrew.sh/) を利用して ADC/MDAS に [tmux](https://github.com/tmux/tmux) をインストールした話です。

@@ -6,7 +6,7 @@ categories  = ["Tech"]
 aliases = ["/blog/26/"]
 +++
 
-## TL;DR :snowman:
+## TL;DR
 
 Matplotlib でプロット以外の余白部分を透明にした図を保存する際のメモです。
 何も考えずに `plt.savefig()` で `transparent=True` としてしまうと、以下のようにプロット部分も透明になってしまいます。

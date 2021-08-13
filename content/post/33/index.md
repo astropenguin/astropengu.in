@@ -7,7 +7,7 @@ categories = ["Tech"]
 image = "image.jpg"
 +++
 
-## TL;DR :snowman:
+## TL;DR
 
 以前の記事（[ADC/MDAS への Linuxbrew のインストール](/posts/11)）で、天文データセンター（ADC）の多波長データ解析システム（MDAS）に Linuxbrew をインストールする際の手順をまとめました。
 ところが、システムにインストールされているcURLとGitのバージョンが古いため、2021年2月時点で最新版のLinuxbrewでは新規インストールやアップデートの際にエラーが出てしまいます。

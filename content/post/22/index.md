@@ -6,7 +6,7 @@ categories = ["Tech"]
 aliases = ["/blog/22/"]
 +++
 
-## TL;DR :christmas_tree:
+## TL;DR
 
 これはアドベントカレンダーの16日目の記事です。
 今日は雑ですが、Hugo に標準で実装されている、ショートコードを使ったメディアの埋め込みのメモです。

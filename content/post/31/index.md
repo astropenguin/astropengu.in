@@ -6,7 +6,7 @@ categories = ["Tech"]
 image = "image.jpg"
 +++
 
-## TL;DR :sunflower:
+## TL;DR
 
 [xarray]は多次元配列にメタデータ（軸のラベルなど）がくっついたデータを扱うためのツールとして、[NumPy]や[pandas]と同様にデータ解析で使われるPythonパッケージですが、様々なデータをxarray（のDataArray）で扱っていく中で以下のように感じることが増えてきました。
 
