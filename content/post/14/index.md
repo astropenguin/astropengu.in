@@ -6,7 +6,7 @@ categories = ["Tech"]
 aliases = ["/blog/14/"]
 +++
 
-## TL;DR :christmas_tree:
+## TL;DR
 
 これはアドベントカレンダーの8日目の記事です。
 今日から数回に渡って、このウェブサイト https://astropengu.in の作成方法についてメモしていきます。

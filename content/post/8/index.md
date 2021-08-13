@@ -6,7 +6,7 @@ categories = ["Tech"]
 aliases = ["/blog/8/"]
 +++
 
-## TL;DR :christmas_tree:
+## TL;DR
 
 これはアドベントカレンダーの2日目の記事です。
 Pythonにおけるシングルトンの実装を試してみた際のメモです。

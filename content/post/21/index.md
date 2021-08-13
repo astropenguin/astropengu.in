@@ -6,7 +6,7 @@ categories = ["Tech"]
 aliases = ["/blog/21/"]
 +++
 
-## TL;DR :christmas_tree:
+## TL;DR
 
 これはアドベントカレンダーの15日目の記事です。
 今日は、Python の関数出力を一時的に変化させないようにキャッシュするという、わりとマニアックな話のメモです。

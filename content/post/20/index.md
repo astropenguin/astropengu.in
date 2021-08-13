@@ -6,7 +6,7 @@ categories = ["Tech"]
 aliases = ["/blog/20/"]
 +++
 
-## TL;DR :christmas_tree:
+## TL;DR
 
 これはアドベントカレンダーの14日目の記事です。
 [2018年の Python プロジェクトのはじめかた](https://qiita.com/sl2/items/1e503952b9506a0539ea) にもあるように、[pipenv](https://pipenv-ja.readthedocs.io/ja/translate-ja/) の登場によって Python でも依存関係 (Python バージョン + パッケージ) を両方管理した環境構築が簡単にできるようになりました。

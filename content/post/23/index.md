@@ -6,7 +6,7 @@ categories  = ["Tech"]
 aliases = ["/blog/23/"]
 +++
 
-## TL;DR :christmas_tree:
+## TL;DR
 
 これはアドベントカレンダーの17日目の記事です。
 今日は、Python のパッケージのインストールで使われる setup.py の内容を、設定ファイル setup.cfg に切り出して管理するための方法をまとめました。

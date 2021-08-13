@@ -6,7 +6,7 @@ categories = ["Tech"]
 aliases = ["/blog/16/"]
 +++
 
-## TL;DR :christmas_tree:
+## TL;DR
 
 これはアドベントカレンダーの10日目の記事です。
 今日は[昨日の続き](/blog/15)で、Hugo で作成したテストサイトの設定をいじっていきます。

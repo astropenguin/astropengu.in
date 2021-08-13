@@ -6,7 +6,7 @@ categories  = ["Tech"]
 aliases = ["/blog/27/"]
 +++
 
-## TL;DR :snowman:
+## TL;DR
 
 [SSHの公開鍵配布を簡単にやる](https://s8a.jp/distribution-of-ssh-key#%E9%9D%A2%E5%80%92%E3%81%AA%E5%85%AC%E9%96%8B%E9%8D%B5%E3%81%AE%E9%85%8D%E5%B8%83%E3%82%92%E7%B0%A1%E7%B4%A0%E5%8C%96%E3%81%99%E3%82%8B) を読んでなるほどなと思ったので、自分の環境でもやってみることにしました。
 つまり、GitHub に登録した SSH 公開鍵が URL で公開されていることを利用して、これを各種サーバに設置する公開鍵として使おうということです。

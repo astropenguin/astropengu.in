@@ -6,7 +6,7 @@ categories  = ["Tech"]
 aliases = ["/blog/28/"]
 +++
 
-## TL;DR :cherry_blossom:
+## TL;DR
 
 ウェブサイトの [Hugo] theme として、しばらくの間 [Minimo] を使ってきましたが、 新年度を迎えて心機一転？ということでさらにミニマムな [Hello Friend] に変更しました。
 サイドバーなしの one column で、メニューバーの右上からライト・ダークテーマの切り替えをユーザ側でできます。

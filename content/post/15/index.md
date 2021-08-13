@@ -6,7 +6,7 @@ categories = ["Tech"]
 aliases = ["/blog/15/"]
 +++
 
-## TL;DR :christmas_tree:
+## TL;DR
 
 これはアドベントカレンダーの9日目の記事です。
 今日は[昨日の続き](/blog/14)で、いよいよ Hugo を使ってウェブサイトを作成していきます。

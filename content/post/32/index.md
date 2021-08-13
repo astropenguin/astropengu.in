@@ -7,7 +7,7 @@ categories = ["Tech"]
 image = "image.jpg"
 +++
 
-## TL;DR :bamboo:
+## TL;DR
 
 Pythonのクラス・メタクラス関連は毎回こんがらかるのでメモ。`__new__`・`__init__`・`type`の役割を正しく理解するのが重要。
 まず、以下では通常のクラス定義として以下を考えることにする。

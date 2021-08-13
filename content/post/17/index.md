@@ -6,7 +6,7 @@ categories = ["Tech"]
 aliases = ["/blog/17/"]
 +++
 
-## TL;DR :christmas_tree:
+## TL;DR
 
 これはアドベントカレンダーの11日目の記事です。
 今日は雑ですが、プログラミング用フォント Ricty のインストールのメモです。

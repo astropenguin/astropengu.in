@@ -6,7 +6,7 @@ categories = ["Tech"]
 aliases = ["/blog/18/"]
 +++
 
-## TL;DR :christmas_tree:
+## TL;DR
 
 これはアドベントカレンダーの12日目の記事です。
 今日は、Python 製のジオコーディングライブラリの [Geocoder](https://geocoder.readthedocs.io/) を試してみたという話です。

@@ -9,14 +9,6 @@
     height: 0px;
 }
 
-/* twemoji */
-img.emoji {
-    height: 1em;
-    width: 1em;
-    display: inline;
-    vertical-align: -0.1em;
-}
-
 /* workaround for extra space in footer */
 .article-footer > .article-time {
     gap: 0px;
