@@ -1,4 +1,3 @@
-
 /* font family */
 :root {
     --base-font-family: "M PLUS 1p", sans-serif;
@@ -10,4 +9,9 @@ img.emoji {
     width: 1em;
     display: inline;
     vertical-align: -0.1em;
+}
+
+/* workaround for extra space in footer */
+.article-footer > .article-time {
+    gap: 0px;
 }
