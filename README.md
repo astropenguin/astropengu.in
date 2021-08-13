@@ -1,27 +1,28 @@
 # website
 
-![Test](https://github.com/astropenguin/website/workflows/Test/badge.svg)
+![Tests](https://github.com/astropenguin/website/workflows/Tests/badge.svg)
 ![GitHub Pages](https://github.com/astropenguin/website/workflows/GitHub%20Pages/badge.svg)
 
-:penguin: Personal website powered by Hugo ([astropengu.in](https://astropengu.in))
+Personal website powered by Hugo ([astropengu.in](https://astropengu.in))
 
-## Requirements
+## Editing in a local machine
 
-Hugo extended v0.78.0 or later is required.
+### Install Hugo
+
+[Hugo extended v0.87.0](https://github.com/gohugoio/hugo/releases/tag/v0.87.0) or later is required.
+For macOS or Linux, it can be installed using [Homebrew](https://brew.sh):
 
 ```shell
 $ brew install hugo
 ```
 
-## Development
-
-### Download source codes
+### Download the source codes
 
 ```shell
 $ git clone --recursive https://github.com/astropenguin/website.git /path/to/website
 ```
 
-### Run website locally
+### Run the website
 
 ```shell
 $ cd /path/to/website
