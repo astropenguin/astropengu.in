@@ -3,6 +3,12 @@
     --base-font-family: "M PLUS 1p", sans-serif;
 }
 
+/* scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 0px;
+}
+
 /* twemoji */
 img.emoji {
     height: 1em;
