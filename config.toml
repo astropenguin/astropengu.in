@@ -89,6 +89,9 @@ page = "/:filename"
 [params]
 mainSections = ["post"]
 
+[params.article]
+readingTime = true
+
 [params.article.license]
 enabled = true
 default = "Licensed under CC BY 4.0"

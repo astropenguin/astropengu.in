@@ -17,10 +17,22 @@ list:
         other: Subsections
 
 article:
+    back:
+        other: Back
+
+    tableOfContents:
+        other: Table of contents
+
     relatedContents:
         other: Related contents
+
     lastUpdatedOn:
         other: Last updated on
+
+    readingTime:
+        one: "{{ .Count }} min read"
+        ### Seems that there's no need to add 's' even if it's plural in English
+        other: "{{ .Count }} min read"
 
 notFound:
     title:
@@ -32,8 +44,10 @@ widget:
     archives:
         title:
             other: Archives
+
         more:
             other: More
+
     tagCloud:
         title:
             other: Tags
@@ -41,13 +55,16 @@ widget:
 search:
     title:
         other: Search
+
     placeholder:
         other: Type something...
+
     resultTitle:
         other: "#PAGES_COUNT pages (#TIME_SECONDS seconds)"
 
 footer:
     builtWith:
         other: Built with {{ .Generator }}
+
     designedBy:
         other: Theme {{ .Theme }} designed by {{ .DesignedBy }}
