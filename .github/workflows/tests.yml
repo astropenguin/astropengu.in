@@ -1,6 +1,12 @@
-name: Test
+name: Tests
 
-on: push
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   job:
@@ -9,12 +15,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          fetch-depth: 0
           submodules: true
       - name: Install dependencies
         uses: peaceiris/actions-hugo@v2
         with:
-          hugo-version: '0.79.1'
+          hugo-version: '0.87.0'
           extended: true
       - name: Build site
         run: hugo --minify
