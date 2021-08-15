@@ -3,7 +3,7 @@
 ![Tests](https://github.com/astropenguin/website/workflows/Tests/badge.svg)
 ![GitHub Pages](https://github.com/astropenguin/website/workflows/GitHub%20Pages/badge.svg)
 
-Personal website powered by Hugo ([astropengu.in](https://astropengu.in))
+Personal website powered by [Hugo](https://gohugo.io) and [the Stack theme](https://github.com/CaiJimmy/hugo-theme-stack)
 
 ## Editing in a local machine
 
