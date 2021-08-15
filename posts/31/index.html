@@ -1,0 +1,366 @@
+<!doctype html><html lang=ja>
+<head><meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="TL;DR xarrayは多次元配列にメタデータ（軸のラベルなど）がくっついたデータを扱うためのツールとして、NumPyやpandasと同様にデータ解析で使われるPythonパッケージですが、様々なデータをxa"><title>Pythonのデータクラスのようにxarrayのデータ構造を定義する</title>
+<link rel=canonical href=https://astropengu.in/posts/31/>
+<link rel=stylesheet href=/scss/style.min.css><meta property="og:title" content="Pythonのデータクラスのようにxarrayのデータ構造を定義する">
+<meta property="og:description" content="TL;DR xarrayは多次元配列にメタデータ（軸のラベルなど）がくっついたデータを扱うためのツールとして、NumPyやpandasと同様にデータ解析で使われるPythonパッケージですが、様々なデータをxa">
+<meta property="og:url" content="https://astropengu.in/posts/31/">
+<meta property="og:site_name" content="astropenguin">
+<meta property="og:type" content="article"><meta property="article:section" content="Post"><meta property="article:tag" content="Python"><meta property="article:tag" content="NumPy"><meta property="article:tag" content="pandas"><meta property="article:tag" content="xarray"><meta property="article:published_time" content="2020-07-24T01:46:17+09:00"><meta property="article:modified_time" content="2021-08-15T20:00:46+09:00"><meta property="og:image" content="https://astropengu.in/posts/31/image.jpg">
+<meta name=twitter:site content="@astropengu_in">
+<meta name=twitter:creator content="@astropengu_in"><meta name=twitter:title content="Pythonのデータクラスのようにxarrayのデータ構造を定義する">
+<meta name=twitter:description content="TL;DR xarrayは多次元配列にメタデータ（軸のラベルなど）がくっついたデータを扱うためのツールとして、NumPyやpandasと同様にデータ解析で使われるPythonパッケージですが、様々なデータをxa"><meta name=twitter:card content="summary_large_image">
+<meta name=twitter:image content="https://astropengu.in/posts/31/image.jpg"><link rel=preconnect href=https://fonts.googleapis.com>
+<link rel=preconnect href=https://fonts.gstatic.com crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+1p:wght@400;700&display=swap" rel=stylesheet>
+</head>
+<body class=article-page>
+<script>(function(){const a='StackColorScheme';localStorage.getItem(a)||localStorage.setItem(a,"auto")})()</script><script>(function(){const b='StackColorScheme',a=localStorage.getItem(b),c=window.matchMedia('(prefers-color-scheme: dark)').matches===!0;a=='dark'||a==='auto'&&c?document.documentElement.dataset.scheme='dark':document.documentElement.dataset.scheme='light'})()</script>
+<div class="container main-container flex
+on-phone--column extended">
+<aside class="sidebar left-sidebar sticky">
+<button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
+<span class=hamburger-box>
+<span class=hamburger-inner></span>
+</span>
+</button>
+<header class=site-info>
+<figure class=site-avatar>
+<img src="https://www.gravatar.com/avatar/631d6d325e5913f5e9ea9a500c761b0b?s=150" width=300 height=300 class=site-logo loading=lazy alt=Avatar>
+</figure>
+<h1 class=site-name><a href=https://astropengu.in/>astropenguin</a></h1>
+<h2 class=site-description>Akio Taniguchi's website</h2>
+</header>
+<ol class=menu id=main-menu>
+<li>
+<a href=/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>Home</span>
+</a>
+</li>
+<li>
+<a href=/about><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+<span>About</span>
+</a>
+</li>
+<li>
+<a href=/search><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span>
+</a>
+</li>
+<li>
+<a href=https://github.com/astropenguin/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg>
+<span>GitHub</span>
+</a>
+</li>
+<li>
+<a href=https://twitter.com/astropengu_in/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M22 4.01c-1 .49-1.98.689-3 .99-1.121-1.265-2.783-1.335-4.38-.737S11.977 6.323 12 8v1c-3.245.083-6.135-1.395-8-4 0 0-4.182 7.433 4 11-1.872 1.247-3.739 2.088-6 2 3.308 1.803 6.913 2.423 10.034 1.517 3.58-1.04 6.522-3.723 7.651-7.742a13.84 13.84.0 00.497-3.753C20.18 7.773 21.692 5.25 22 4.009z"/></svg>
+<span>Twitter</span>
+</a>
+</li>
+<li>
+<a href="https://scholar.google.com/citations?user=O4aEvvcAAAAJ"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-school" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M22 9 12 5 2 9l10 4 10-4v6"/><path d="M6 10.6V16a6 3 0 0012 0v-5.4"/></svg>
+<span>Papers</span>
+</a>
+</li>
+<li id=dark-mode-toggle><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>Dark Mode</span>
+</li>
+</ol>
+</aside>
+<main class="main full-width">
+<article class="has-image main-article">
+<header class=article-header>
+<div class=article-image>
+<a href=/posts/31/>
+<img src=/posts/31/image_huab13b69368037f19875f50bf380cdf80_225815_800x0_resize_q75_box.jpg srcset="/posts/31/image_huab13b69368037f19875f50bf380cdf80_225815_800x0_resize_q75_box.jpg 800w, /posts/31/image_huab13b69368037f19875f50bf380cdf80_225815_1600x0_resize_q75_box.jpg 1600w" width=800 height=533 loading=lazy alt="Featured image of post Pythonのデータクラスのようにxarrayのデータ構造を定義する">
+</a>
+</div>
+<div class=article-details>
+<header class=article-category>
+<a href=/categories/tech/ style=background-color:#00a3af;color:#fff>
+Tech
+</a>
+</header>
+<h2 class=article-title>
+<a href=/posts/31/>Pythonのデータクラスのようにxarrayのデータ構造を定義する</a>
+</h2>
+<footer class=article-time>
+<div><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>2020-07-24</time>
+</div>
+<div><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>
+6 min read
+</time>
+</div>
+</footer>
+</div>
+</header>
+<section class=article-content>
+<h2 id=tldr>TL;DR</h2>
+<p><a class=link href=https://xarray.pydata.org/en/stable/index.html target=_blank rel=noopener>xarray</a>は多次元配列にメタデータ（軸のラベルなど）がくっついたデータを扱うためのツールとして、<a class=link href=https://numpy.org target=_blank rel=noopener>NumPy</a>や<a class=link href=https://pandas.pydata.org target=_blank rel=noopener>pandas</a>と同様にデータ解析で使われるPythonパッケージですが、様々なデータをxarray（のDataArray）で扱っていく中で以下のように感じることが増えてきました。</p>
+<ul>
+<li>多次元配列の軸（dimensions）や型（dtype）を指定した配列生成関数がほしい</li>
+<li>同様にメタデータ（coordinates）にも軸・型・デフォルトの値を指定したい</li>
+<li>上2つを満たした<a class=link href=https://numpy.org target=_blank rel=noopener>NumPy</a>の<code>ones()</code>のような特別な配列生成をしたい</li>
+<li>データ独自の処理（メソッド）を定義したい</li>
+</ul>
+<p>これらをかなえる方法は色々考えられますが、Python 3.7から標準ライブラリに登場したデータクラス（<a class=link href=https://docs.python.org/ja/3/library/dataclasses.html target=_blank rel=noopener>dataclasses</a>）が同じような悩み？をシンプルな書き方で解決していることに気づきました。そこで、データクラスと同様の書き方でユーザ定義のDataArrayクラスを作成するためのパッケージ「<a class=link href=https://github.com/astropenguin/xarray-custom target=_blank rel=noopener>xarray-custom</a>」を公開しましたのでご紹介します（pipでインストールできます）。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=color:#ff79c6>from</span> xarray_custom <span style=color:#ff79c6>import</span> ctype, dataarrayclass
+
+@dataarrayclass(accessor<span style=color:#ff79c6>=</span><span style=color:#f1fa8c>&#39;img&#39;</span>)
+<span style=color:#ff79c6>class</span> <span style=color:#50fa7b>Image</span>:
+    <span style=color:#f1fa8c>&#34;&#34;&#34;DataArray class to represent images.&#34;&#34;&#34;</span>
+
+    dims <span style=color:#ff79c6>=</span> <span style=color:#f1fa8c>&#39;x&#39;</span>, <span style=color:#f1fa8c>&#39;y&#39;</span>
+    dtype <span style=color:#ff79c6>=</span> <span style=color:#8be9fd;font-style:italic>float</span>
+    x: ctype(<span style=color:#f1fa8c>&#39;x&#39;</span>, <span style=color:#8be9fd;font-style:italic>int</span>) <span style=color:#ff79c6>=</span> <span style=color:#bd93f9>0</span>
+    y: ctype(<span style=color:#f1fa8c>&#39;y&#39;</span>, <span style=color:#8be9fd;font-style:italic>int</span>) <span style=color:#ff79c6>=</span> <span style=color:#bd93f9>0</span>
+
+    <span style=color:#ff79c6>def</span> <span style=color:#50fa7b>normalize</span>(self):
+        <span style=color:#ff79c6>return</span> self <span style=color:#ff79c6>/</span> self<span style=color:#ff79c6>.</span>max()
+</code></pre></div><p>以下ではこのコードの仕組みを、PythonのデータクラスやDataAraryに触れながら解説していきます。</p>
+<h2 id=pythons-dataclass>Python&rsquo;s dataclass</h2>
+<p>まず、Pythonのデータクラスとはユーザ定義のデータ構造を簡単に作成するための機能（クラスデコレータ）です。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=color:#ff79c6>from</span> dataclasses <span style=color:#ff79c6>import</span> dataclass
+
+@dataclass
+<span style=color:#ff79c6>class</span> <span style=color:#50fa7b>Coordinates</span>:
+    x: <span style=color:#8be9fd;font-style:italic>float</span>
+    y: <span style=color:#8be9fd;font-style:italic>float</span>
+
+    @classmethod
+    <span style=color:#ff79c6>def</span> <span style=color:#50fa7b>origin</span>(cls):
+        <span style=color:#ff79c6>return</span> cls(<span style=color:#bd93f9>0.0</span>, <span style=color:#bd93f9>0.0</span>)
+
+    <span style=color:#ff79c6>def</span> <span style=color:#50fa7b>norm</span>(self):
+        <span style=color:#ff79c6>return</span> (self<span style=color:#ff79c6>.</span>x <span style=color:#ff79c6>**</span> <span style=color:#bd93f9>2</span> <span style=color:#ff79c6>+</span> self<span style=color:#ff79c6>.</span>y <span style=color:#ff79c6>**</span><span style=color:#bd93f9>2</span>) <span style=color:#ff79c6>**</span> <span style=color:#bd93f9>0.5</span>
+</code></pre></div><p>このようにクラスを定義すると、</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python>coord <span style=color:#ff79c6>=</span> Coordinates(x<span style=color:#ff79c6>=</span><span style=color:#bd93f9>3</span>, y<span style=color:#ff79c6>=</span><span style=color:#bd93f9>4</span>)
+</code></pre></div><p>のようにデータを格納するクラスを作成してくれます（本来は<code>__init__()</code>など諸々の特殊メソッドの実装が必要）。このようにデータクラスを定義することの利点としては以下が考えられるかと思います。</p>
+<ul>
+<li>格納する値に名前・型（型ヒントのみ）・デフォルト値を持たせることができる</li>
+<li>特別なデータ生成（上の例では<code>origin()</code>）をクラスメソッドで実現できる</li>
+<li>データ独自の処理（上の例では<code>norm()</code>）をインスタンスメソッドで実現できる</li>
+</ul>
+<h2 id=xarrays-dataarray>xarray&rsquo;s DataArray</h2>
+<p>次に、<a class=link href=https://xarray.pydata.org/en/stable/index.html target=_blank rel=noopener>xarray</a>（DataArray）のデータ構造を見ていきます。DataArrayは<a class=link href=https://numpy.org target=_blank rel=noopener>NumPy</a>の多次元配列（data）、軸（dimensions; メタデータの一種）、メタデータ（coordinates）からなるデータ構造を取ります。以下の例は、xyの2軸からなる単色画像をデータをDataArrayで表現しているつもりです。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=color:#ff79c6>from</span> xarray <span style=color:#ff79c6>import</span> DataArray
+
+image <span style=color:#ff79c6>=</span> DataArray(data<span style=color:#ff79c6>=</span>[[<span style=color:#bd93f9>0</span>, <span style=color:#bd93f9>1</span>], [<span style=color:#bd93f9>2</span>, <span style=color:#bd93f9>3</span>]], dims<span style=color:#ff79c6>=</span>(<span style=color:#f1fa8c>&#39;x&#39;</span>, <span style=color:#f1fa8c>&#39;y&#39;</span>),
+                  coords<span style=color:#ff79c6>=</span>{<span style=color:#f1fa8c>&#39;x&#39;</span>: [<span style=color:#bd93f9>0</span>, <span style=color:#bd93f9>1</span>], <span style=color:#f1fa8c>&#39;y&#39;</span>: [<span style=color:#bd93f9>0</span>, <span style=color:#bd93f9>1</span>]})
+<span style=color:#8be9fd;font-style:italic>print</span>(image)
+
+<span style=color:#6272a4># &lt;xarray.DataArray (x: 2, y: 2)&gt;</span>
+<span style=color:#6272a4># array([[0., 1.],</span>
+<span style=color:#6272a4>#        [2., 3.]])</span>
+<span style=color:#6272a4># Coordinates:</span>
+<span style=color:#6272a4>#   * x        (x) int64 0 1</span>
+<span style=color:#6272a4>#   * y        (y) int64 0 1</span>
+</code></pre></div><p><code>DataArray</code>はクラスなので、ユーザ定義のDataArrayを定義するための一般的な方法は<code>DataArray</code>をサブクラスとした新しいクラスを作成することです。しかし、<code>__init__()</code>などに定義をハードコードしてしまうと使い回しが効かないという問題があります。また、<a class=link href=https://xarray.pydata.org/en/stable/index.html target=_blank rel=noopener>xarray</a>や<a class=link href=https://pandas.pydata.org target=_blank rel=noopener>pandas</a>ではそもそもサブクラス化を積極的に推奨しておらず、アクセサ（accessor）という特別なオブジェクトを介してユーザ定義の処理などを実装するのが良いとしています。</p>
+<blockquote>
+<p>One standard solution to this problem is to subclass Dataset and/or DataArray to add domain specific functionality. However, inheritance is not very robust. It’s easy to inadvertently use internal APIs when subclassing, which means that your code may break when xarray upgrades. Furthermore, many builtin methods will only return native xarray objects.
+(<a class=link href=https://xarray.pydata.org/en/stable/internals.html#extending-xarray target=_blank rel=noopener>Extending xarray</a> - xarray 0.15.0 documentation)</p>
+</blockquote>
+<h2 id=xarrays-dataarrayclass>xarray&rsquo;s dataarrayclass</h2>
+<p>ようやく本題です。冒頭に書いたような要望を実現するには、xarray（DataArray）の事情も考慮すると、</p>
+<ul>
+<li>（メタ）データの定義をハードコードせずに配列生成する方法を提供する</li>
+<li>アクセサを介したユーザ定義の処理を提供する</li>
+<li>これらをシンプルな書き方でできるようにする</li>
+</ul>
+<p>ことが必要だということが分かりました。そこで、<a class=link href=https://github.com/astropenguin/xarray-custom target=_blank rel=noopener>xarray-custom</a>ではPythonのデータクラスに慣い、<strong>ユーザ定義のDataArrayクラスをクラスデコレータ（dataarrayclass）で動的に改変する</strong>ことで実現することにしました。<a class=link href=https://github.com/astropenguin/xarray-custom target=_blank rel=noopener>xarray-custom</a>を使うと上の単色画像の例は以下のように定義できます。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=color:#ff79c6>from</span> xarray_custom <span style=color:#ff79c6>import</span> ctype, dataarrayclass
+
+@dataarrayclass(accessor<span style=color:#ff79c6>=</span><span style=color:#f1fa8c>&#39;img&#39;</span>)
+<span style=color:#ff79c6>class</span> <span style=color:#50fa7b>Image</span>:
+    <span style=color:#f1fa8c>&#34;&#34;&#34;DataArray class to represent images.&#34;&#34;&#34;</span>
+
+    dims <span style=color:#ff79c6>=</span> <span style=color:#f1fa8c>&#39;x&#39;</span>, <span style=color:#f1fa8c>&#39;y&#39;</span>
+    dtype <span style=color:#ff79c6>=</span> <span style=color:#8be9fd;font-style:italic>float</span>
+    x: ctype(<span style=color:#f1fa8c>&#39;x&#39;</span>, <span style=color:#8be9fd;font-style:italic>int</span>) <span style=color:#ff79c6>=</span> <span style=color:#bd93f9>0</span>
+    y: ctype(<span style=color:#f1fa8c>&#39;y&#39;</span>, <span style=color:#8be9fd;font-style:italic>int</span>) <span style=color:#ff79c6>=</span> <span style=color:#bd93f9>0</span>
+
+    <span style=color:#ff79c6>def</span> <span style=color:#50fa7b>normalize</span>(self):
+        <span style=color:#ff79c6>return</span> self <span style=color:#ff79c6>/</span> self<span style=color:#ff79c6>.</span>max()
+</code></pre></div><p>データクラスを知っていることで、このコードで何をしているのかは説明なしでも何となく理解していただけたのではないでしょうか。ここでのポイントは以下の3点です。</p>
+<ul>
+<li>クラス変数でデータの軸（<code>'x', 'y'</code>）・型（<code>float</code>）を指定する</li>
+<li>特別な型付きのクラス変数で軸を含むメタデータの名前・軸・型・デフォルト値を指定する</li>
+<li>ユーザ定義の処理（メソッド）はアクセサ（<code>img</code>）配下に自動的に移動させる</li>
+</ul>
+<p>ここで、<code>ctype</code>はメタデータを定義する特別な型（クラス）を生成するための関数です。それでは実際にユーザ定義の配列を生成してみましょう。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python>image <span style=color:#ff79c6>=</span> Image([[<span style=color:#bd93f9>0</span>, <span style=color:#bd93f9>1</span>], [<span style=color:#bd93f9>2</span>, <span style=color:#bd93f9>3</span>]], x<span style=color:#ff79c6>=</span>[<span style=color:#bd93f9>0</span>, <span style=color:#bd93f9>1</span>], y<span style=color:#ff79c6>=</span>[<span style=color:#bd93f9>0</span>, <span style=color:#bd93f9>1</span>])
+<span style=color:#8be9fd;font-style:italic>print</span>(image)
+
+<span style=color:#6272a4># &lt;xarray.DataArray (x: 2, y: 2)&gt;</span>
+<span style=color:#6272a4># array([[0., 1.],</span>
+<span style=color:#6272a4>#        [2., 3.]])</span>
+<span style=color:#6272a4># Coordinates:</span>
+<span style=color:#6272a4>#   * x        (x) int64 0 1</span>
+<span style=color:#6272a4>#   * y        (y) int64 0 1</span>
+</code></pre></div><p>軸とメタデータが予め定義されているので、上のDataArrayの例と比べてとても簡潔に書けることが分かります。データクラスと異なるのは、型の情報が配列の型を決めるのに実際に使われるという点です。上の例では、integerのリストがDataArray内ではfloatに型変換されています。（暗黙の）型変換ができない場合は<code>ValueError</code>が送出されます。また、型を指定しないこともできます（その場合、任意の型のオブジェクトを受け付けます）。</p>
+<h3 id=instance-methods-via-an-accessor>Instance methods via an accessor</h3>
+<p><a class=link href=https://xarray.pydata.org/en/stable/index.html target=_blank rel=noopener>xarray</a>の方針に従い、クラスに定義したインスタンスメソッド（上の例では<code>normalize()</code>）はアクセサを介して実行することができます。アクセサなしで実行すると<code>AttributeError</code>が送出されます。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python>normalized <span style=color:#ff79c6>=</span> image<span style=color:#ff79c6>.</span>img<span style=color:#ff79c6>.</span>normalize()
+<span style=color:#8be9fd;font-style:italic>print</span>(normalized)
+
+<span style=color:#6272a4># &lt;xarray.DataArray (x: 2, y: 2)&gt;</span>
+<span style=color:#6272a4># array([[0.        , 0.33333333],</span>
+<span style=color:#6272a4>#        [0.66666667, 1.        ]])</span>
+<span style=color:#6272a4># Coordinates:</span>
+<span style=color:#6272a4>#   * x        (x) int64 0 1</span>
+<span style=color:#6272a4>#   * y        (y) int64 0 1</span>
+</code></pre></div><h3 id=special-functions-as-class-methods>Special functions as class methods</h3>
+<p>特別な配列生成として、<a class=link href=https://numpy.org target=_blank rel=noopener>NumPy</a>に慣い<code>zeros()</code>・<code>ones()</code>・<code>empty()</code>・<code>full()</code>がクラスメソッドとして自動的に追加されています。<code>zeros_like()</code>などは<a class=link href=https://xarray.pydata.org/en/stable/index.html target=_blank rel=noopener>xarray</a>のトップレベル関数に定義されていますのでそちらを使いましょう。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python>uniform <span style=color:#ff79c6>=</span> Image<span style=color:#ff79c6>.</span>ones((<span style=color:#bd93f9>2</span>, <span style=color:#bd93f9>3</span>))
+<span style=color:#8be9fd;font-style:italic>print</span>(uniform)
+
+<span style=color:#6272a4># &lt;xarray.DataArray (x: 2, y: 3)&gt;</span>
+<span style=color:#6272a4># array([[1., 1., 1.],</span>
+<span style=color:#6272a4>#        [1., 1., 1.]])</span>
+<span style=color:#6272a4># Coordinates:</span>
+<span style=color:#6272a4>#   * x        (x) int64 0 0</span>
+<span style=color:#6272a4>#   * y        (y) int64 0 0 0</span>
+</code></pre></div><h2 id=misc>Misc</h2>
+<p>ここまでの話で、<code>dataarrayclass</code>でも<code>DataArray</code>のサブクラス化を結局行っているのでは？と思った方もいらっしゃるかもしれません。が、実際は生成されるDataArrayは本物の<code>DataArray</code>インスタンスです。逆に言うと、上の例では<code>Image</code>インスタンスではありません。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=color:#8be9fd;font-style:italic>print</span>(<span style=color:#8be9fd;font-style:italic>type</span>(image)) <span style=color:#6272a4># xarray.core.dataarray.DataArray</span>
+</code></pre></div><p>これは、<code>dataarrayclass</code>内部では<code>__init__()</code>ではなく<code>__new__()</code>を動的に生成しており、<code>__new__()</code>がDataArrayを返すようにしているためです。このため、普通のクラスから作られたインスタンスのように、クラス変数等にアクセスできないことに注意が必要です。</p>
+<p><a class=link href=https://xarray.pydata.org/en/stable/index.html target=_blank rel=noopener>xarray</a>は<a class=link href=https://numpy.org target=_blank rel=noopener>NumPy</a>や<a class=link href=https://pandas.pydata.org target=_blank rel=noopener>pandas</a>に比べると記事数も少なく知名度も低いのかなという印象ですが、多次元配列を扱う課題には間違いなく有用ですのでどんどん使っていきたいところです。<a class=link href=https://github.com/astropenguin/xarray-custom target=_blank rel=noopener>xarray-custom</a>は開発初期で機能も少ないですが、こうした拡張機能の開発や記事を通して少しでもコミュニティに貢献できればと思っております。</p>
+<h2 id=references>References</h2>
+<ul>
+<li><a class=link href=https://github.com/astropenguin/xarray-custom target=_blank rel=noopener>xarray-custom</a>
+<ul>
+<li><a class=link href=https://astropenguin.github.io/xarray-custom target=_blank rel=noopener>Documentation</a></li>
+</ul>
+</li>
+<li><a class=link href=https://xarray.pydata.org/en/stable/index.html target=_blank rel=noopener>xarray</a>
+<ul>
+<li><a class=link href=https://xarray.pydata.org/en/stable/terminology.html target=_blank rel=noopener>Terminology</a></li>
+<li><a class=link href=https://xarray.pydata.org/en/stable/internals.html#extending-xarray target=_blank rel=noopener>Extending xarray</a></li>
+</ul>
+</li>
+<li><a class=link href=https://pandas.pydata.org target=_blank rel=noopener>pandas</a>
+<ul>
+<li><a class=link href=https://pandas.pydata.org/docs/development/extending.html#registering-custom-accessors target=_blank rel=noopener>Registering custom accessors</a></li>
+</ul>
+</li>
+</ul>
+</section>
+<footer class=article-footer>
+<section class=article-tags>
+<a href=/tags/python/>Python</a>
+<a href=/tags/numpy/>NumPy</a>
+<a href=/tags/pandas/>pandas</a>
+<a href=/tags/xarray/>xarray</a>
+</section>
+<section class=article-copyright><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under CC BY 4.0</span>
+</section>
+<section class=article-lastmod><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<span>
+Last updated on 2021-08-15 20:00 +0900
+</span>
+</section></footer>
+</article>
+<aside class=related-contents--wrapper>
+<h2 class=section-title>Related contents</h2>
+<div class=related-contents>
+<div class="flex article-list--tile">
+<article class=has-image>
+<a href=/posts/29/>
+<div class=article-image>
+<img src=/posts/29/image.926232f66487c58f832a1d26d1fb8449_huab13b69368037f19875f50bf380cdf80_225815_250x150_fill_q75_box_smart1.jpg width=250 height=150 loading=lazy data-key data-hash="md5-kmIy9mSHxY+DKh0m0fuESQ==">
+</div>
+<div class=article-details>
+<h2 class=article-title>Pandasとセットで理解するxarray：データ構造編</h2>
+</div>
+</a>
+</article>
+<article>
+<a href=/posts/3/>
+<div class=article-details>
+<h2 class=article-title>畳み込みによる画像のノイズ除去</h2>
+</div>
+</a>
+</article>
+<article class=has-image>
+<a href=/posts/30/>
+<div class=article-image>
+<img src=/posts/30/image.e931310d3fdb2122af11dd6f5bb3db51_hu66482708b471a939ec4727ecbb2ebafe_277748_250x150_fill_q75_box_smart1.jpg width=250 height=150 loading=lazy data-key data-hash="md5-6TExDT/bISKvEd1vW7PbUQ==">
+</div>
+<div class=article-details>
+<h2 class=article-title>Python dictionary の KeyError に keys 一覧を表示させる</h2>
+</div>
+</a>
+</article>
+<article>
+<a href=/posts/26/>
+<div class=article-details>
+<h2 class=article-title>Matplotlib で図の余白のみを透明にする</h2>
+</div>
+</a>
+</article>
+<article>
+<a href=/posts/25/>
+<div class=article-details>
+<h2 class=article-title>Python のタイムゾーン関連まとめ</h2>
+</div>
+</a>
+</article>
+</div>
+</div>
+</aside>
+<footer class=site-footer>
+<section class=copyright>
+&copy;
+2018 -
+2021 astropenguin
+</section>
+<section class=powerby>
+Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> <br>
+Theme <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.1.0>Stack</a></b> designed by <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a>
+</section>
+</footer>
+<div class=pswp tabindex=-1 role=dialog aria-hidden=true>
+<div class=pswp__bg></div>
+<div class=pswp__scroll-wrap>
+<div class=pswp__container>
+<div class=pswp__item></div>
+<div class=pswp__item></div>
+<div class=pswp__item></div>
+</div>
+<div class="pswp__ui pswp__ui--hidden">
+<div class=pswp__top-bar>
+<div class=pswp__counter></div>
+<button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+<div class=pswp__preloader>
+<div class=pswp__preloader__icn>
+<div class=pswp__preloader__cut>
+<div class=pswp__preloader__donut></div>
+</div>
+</div>
+</div>
+</div>
+<div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+<div class=pswp__share-tooltip></div>
+</div>
+<button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+</button>
+<div class=pswp__caption>
+<div class=pswp__caption__center></div>
+</div>
+</div>
+</div>
+</div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.css integrity="sha256-c0uckgykQ9v5k+IqViZOZKc47Jn7KQil4/MP3ySA3F8=" crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.css integrity="sha256-SBLU4vv6CA6lHsZ1XyTdhyjJxCjPif/TRkjnsyGAGnE=" crossorigin=anonymous>
+</main>
+</div>
+<script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.5/dist/vibrant.min.js integrity="sha256-5NovOZc4iwiAWTYIFiIM7DxKUXKWvpVEuMEPLzcm5/g=" crossorigin=anonymous defer></script><script type=text/javascript src=/ts/main.js defer></script>
+<script>(function(){const a=document.createElement('link');a.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",a.type="text/css",a.rel="stylesheet",document.head.appendChild(a)})()</script>
+</body>
+</html>

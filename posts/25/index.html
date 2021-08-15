@@ -1,0 +1,323 @@
+<!doctype html><html lang=ja>
+<head><meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="TL;DR タイムゾーンを扱う Python パッケージを開発した際に調べた情報をまとめておきます。 そもそも Python におけるタイムゾーンは、tzinfo と呼ばれるオブジェクトによって表現されます。 これは、標準ライブラリの datetime.tzinfo クラスの"><title>Python のタイムゾーン関連まとめ</title>
+<link rel=canonical href=https://astropengu.in/posts/25/>
+<link rel=stylesheet href=/scss/style.min.css><meta property="og:title" content="Python のタイムゾーン関連まとめ">
+<meta property="og:description" content="TL;DR タイムゾーンを扱う Python パッケージを開発した際に調べた情報をまとめておきます。 そもそも Python におけるタイムゾーンは、tzinfo と呼ばれるオブジェクトによって表現されます。 これは、標準ライブラリの datetime.tzinfo クラスの">
+<meta property="og:url" content="https://astropengu.in/posts/25/">
+<meta property="og:site_name" content="astropenguin">
+<meta property="og:type" content="article"><meta property="article:section" content="Post"><meta property="article:tag" content="Python"><meta property="article:tag" content="datetime"><meta property="article:tag" content="timezone"><meta property="article:published_time" content="2019-01-19T20:50:59+09:00"><meta property="article:modified_time" content="2021-08-15T20:00:46+09:00">
+<meta name=twitter:site content="@astropengu_in">
+<meta name=twitter:creator content="@astropengu_in"><meta name=twitter:title content="Python のタイムゾーン関連まとめ">
+<meta name=twitter:description content="TL;DR タイムゾーンを扱う Python パッケージを開発した際に調べた情報をまとめておきます。 そもそも Python におけるタイムゾーンは、tzinfo と呼ばれるオブジェクトによって表現されます。 これは、標準ライブラリの datetime.tzinfo クラスの"><link rel=preconnect href=https://fonts.googleapis.com>
+<link rel=preconnect href=https://fonts.gstatic.com crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+1p:wght@400;700&display=swap" rel=stylesheet>
+</head>
+<body class=article-page>
+<script>(function(){const a='StackColorScheme';localStorage.getItem(a)||localStorage.setItem(a,"auto")})()</script><script>(function(){const b='StackColorScheme',a=localStorage.getItem(b),c=window.matchMedia('(prefers-color-scheme: dark)').matches===!0;a=='dark'||a==='auto'&&c?document.documentElement.dataset.scheme='dark':document.documentElement.dataset.scheme='light'})()</script>
+<div class="container main-container flex
+on-phone--column extended">
+<aside class="sidebar left-sidebar sticky">
+<button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
+<span class=hamburger-box>
+<span class=hamburger-inner></span>
+</span>
+</button>
+<header class=site-info>
+<figure class=site-avatar>
+<img src="https://www.gravatar.com/avatar/631d6d325e5913f5e9ea9a500c761b0b?s=150" width=300 height=300 class=site-logo loading=lazy alt=Avatar>
+</figure>
+<h1 class=site-name><a href=https://astropengu.in/>astropenguin</a></h1>
+<h2 class=site-description>Akio Taniguchi's website</h2>
+</header>
+<ol class=menu id=main-menu>
+<li>
+<a href=/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg>
+<span>Home</span>
+</a>
+</li>
+<li>
+<a href=/about><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+<span>About</span>
+</a>
+</li>
+<li>
+<a href=/search><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+<span>Search</span>
+</a>
+</li>
+<li>
+<a href=https://github.com/astropenguin/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg>
+<span>GitHub</span>
+</a>
+</li>
+<li>
+<a href=https://twitter.com/astropengu_in/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M22 4.01c-1 .49-1.98.689-3 .99-1.121-1.265-2.783-1.335-4.38-.737S11.977 6.323 12 8v1c-3.245.083-6.135-1.395-8-4 0 0-4.182 7.433 4 11-1.872 1.247-3.739 2.088-6 2 3.308 1.803 6.913 2.423 10.034 1.517 3.58-1.04 6.522-3.723 7.651-7.742a13.84 13.84.0 00.497-3.753C20.18 7.773 21.692 5.25 22 4.009z"/></svg>
+<span>Twitter</span>
+</a>
+</li>
+<li>
+<a href="https://scholar.google.com/citations?user=O4aEvvcAAAAJ"><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-school" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M22 9 12 5 2 9l10 4 10-4v6"/><path d="M6 10.6V16a6 3 0 0012 0v-5.4"/></svg>
+<span>Papers</span>
+</a>
+</li>
+<li id=dark-mode-toggle><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>Dark Mode</span>
+</li>
+</ol>
+</aside>
+<main class="main full-width">
+<article class=main-article>
+<header class=article-header>
+<div class=article-details>
+<header class=article-category>
+<a href=/categories/tech/ style=background-color:#00a3af;color:#fff>
+Tech
+</a>
+</header>
+<h2 class=article-title>
+<a href=/posts/25/>Python のタイムゾーン関連まとめ</a>
+</h2>
+<footer class=article-time>
+<div><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>2019-01-19</time>
+</div>
+<div><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>
+4 min read
+</time>
+</div>
+</footer>
+</div>
+</header>
+<section class=article-content>
+<h2 id=tldr>TL;DR</h2>
+<p>タイムゾーンを扱う Python パッケージを開発した際に調べた情報をまとめておきます。
+そもそも Python におけるタイムゾーンは、tzinfo と呼ばれるオブジェクトによって表現されます。
+これは、標準ライブラリの <code>datetime.tzinfo</code> クラスのサブクラスとして、標準ライブラリの <code>datetime.timezone</code> や外部ライブラリ pytz によって提供されています。</p>
+<p>以下では、これらを使ってどのように tzinfo を取得・使用できるのかを紹介します。
+その際、Python スクリプトでは以下のようなインポートを仮定しています。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=color:#ff79c6>&gt;&gt;&gt;</span> <span style=color:#ff79c6>import</span> pytz
+<span style=color:#ff79c6>&gt;&gt;&gt;</span> <span style=color:#ff79c6>import</span> geocoder
+<span style=color:#ff79c6>&gt;&gt;&gt;</span> <span style=color:#ff79c6>from</span> timezonefinder <span style=color:#ff79c6>import</span> TimezoneFinder
+<span style=color:#ff79c6>&gt;&gt;&gt;</span> <span style=color:#ff79c6>from</span> datetime <span style=color:#ff79c6>import</span> datetime, timedelta, timezone, tzinfo
+</code></pre></div><p>このうち、pytz・geocoder・timezonefinder は外部ライブラリです。
+ただし、pytz は Python documentation でも紹介されているように、ほとんど標準ライブラリ的な扱いをされていると思われます。</p>
+<h2 id=how-to-get-tzinfo>How to get tzinfo</h2>
+<p>tzinfo を様々な方法で取得する方法をまとめます。
+ここでは <code>datetime.tzinfo</code> クラスと区別するため、取得したオブジェクトの変数名は <code>tz</code> として書いています。</p>
+<h3 id=タイムゾーン-id-から指定する>タイムゾーン ID から指定する</h3>
+<p>まずはベーシックな方法から。
+例えば、日本のタイムゾーン ID は Asia/Tokyo なので、以下のように tzinfo を取得します。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=color:#ff79c6>&gt;&gt;&gt;</span> query <span style=color:#ff79c6>=</span> <span style=color:#f1fa8c>&#39;Asia/Tokyo&#39;</span>
+<span style=color:#ff79c6>&gt;&gt;&gt;</span> tz <span style=color:#ff79c6>=</span> pytz<span style=color:#ff79c6>.</span>timezone(query)
+<span style=color:#ff79c6>&gt;&gt;&gt;</span> tz
+<span style=color:#ff79c6>&lt;</span>DstTzInfo <span style=color:#f1fa8c>&#39;Asia/Tokyo&#39;</span> LMT<span style=color:#ff79c6>+</span><span style=color:#bd93f9>9</span>:<span style=color:#bd93f9>19</span>:<span style=color:#bd93f9>00</span> STD<span style=color:#ff79c6>&gt;</span>
+</code></pre></div><p>ちなみに、全てのタイムゾーン ID は以下のように確認することができます。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=color:#ff79c6>&gt;&gt;&gt;</span> pytz<span style=color:#ff79c6>.</span>all_timezones
+[<span style=color:#f1fa8c>&#39;Africa/Abidjan&#39;</span>,
+ <span style=color:#f1fa8c>&#39;Africa/Accra&#39;</span>,
+ <span style=color:#f1fa8c>&#39;Africa/Addis_Ababa&#39;</span>,
+ <span style=color:#ff79c6>...</span>,
+ <span style=color:#f1fa8c>&#39;Zulu&#39;</span>]
+</code></pre></div><h3 id=utc-からのオフセット値で指定する>UTC からのオフセット値で指定する</h3>
+<p>UTC (協定世界時) からの任意のオフセット値を持つ tzinfo を取得したいときは、以下のようにします。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=color:#ff79c6>&gt;&gt;&gt;</span> query <span style=color:#ff79c6>=</span> <span style=color:#bd93f9>9.0</span>
+<span style=color:#ff79c6>&gt;&gt;&gt;</span> tz <span style=color:#ff79c6>=</span> timezone(timedelta(hours<span style=color:#ff79c6>=</span>query))
+<span style=color:#ff79c6>&gt;&gt;&gt;</span> tz
+datetime<span style=color:#ff79c6>.</span>timezone(datetime<span style=color:#ff79c6>.</span>timedelta(<span style=color:#bd93f9>0</span>, <span style=color:#bd93f9>32400</span>))
+</code></pre></div><p>以下のように文字列に変換することで読みやすい感じになります。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=color:#ff79c6>&gt;&gt;&gt;</span> <span style=color:#8be9fd;font-style:italic>str</span>(tz)
+<span style=color:#f1fa8c>&#39;UTC+09:00&#39;</span>
+</code></pre></div><h3 id=経度緯度から求める>経度緯度から求める</h3>
+<p>実際の開発では、ある場所の経度緯度からタイムゾーンを求めたい場合も多いと思います。
+その際は、外部ライブラリ timezonefinder を使うことで簡単に取得できます。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=color:#ff79c6>&gt;&gt;&gt;</span> query <span style=color:#ff79c6>=</span> {<span style=color:#f1fa8c>&#39;lng&#39;</span>: <span style=color:#bd93f9>135</span>, <span style=color:#f1fa8c>&#39;lat&#39;</span>: <span style=color:#bd93f9>35</span>}
+<span style=color:#ff79c6>&gt;&gt;&gt;</span> tf <span style=color:#ff79c6>=</span> TimezoneFinder()
+<span style=color:#ff79c6>&gt;&gt;&gt;</span> tz <span style=color:#ff79c6>=</span> pytz<span style=color:#ff79c6>.</span>timezone(tf<span style=color:#ff79c6>.</span>timezone_at(<span style=color:#ff79c6>**</span>query))
+<span style=color:#ff79c6>&gt;&gt;&gt;</span> tz
+<span style=color:#ff79c6>&lt;</span>DstTzInfo <span style=color:#f1fa8c>&#39;Asia/Tokyo&#39;</span> LMT<span style=color:#ff79c6>+</span><span style=color:#bd93f9>9</span>:<span style=color:#bd93f9>19</span>:<span style=color:#bd93f9>00</span> STD<span style=color:#ff79c6>&gt;</span>
+</code></pre></div><p>ちなみに、検索すると pytzwhere を使用している例を見かけますが、timezonefinder の方が省メモリかつ高速だそうです。
+最近の開発もこちらの方が活発っぽいので、これを使っておくのが良さそうです。</p>
+<ul>
+<li><a class=link href=https://github.com/MrMinimal64/timezonefinder#comparison-to-pytzwhere target=_blank rel=noopener>Comparison to pytzwhere - MrMinimal64/timezonefinder</a></li>
+</ul>
+<h3 id=場所名から求める>場所名から求める</h3>
+<p>さらに、ある場所名から直接タイムゾーンを求めたい場合、場所名→経度緯度への変換を何かしらの方法で行う必要があります。
+ここでは、<a class=link href=https://openstreetmap.jp/ target=_blank rel=noopener>OpenStreetMap</a> からジオコーディングが可能な geocoder を使った例を紹介します。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=color:#ff79c6>&gt;&gt;&gt;</span> query <span style=color:#ff79c6>=</span> <span style=color:#f1fa8c>&#39;名古屋市&#39;</span>
+<span style=color:#ff79c6>&gt;&gt;&gt;</span> g <span style=color:#ff79c6>=</span> geocoder<span style=color:#ff79c6>.</span>osm(query)
+<span style=color:#ff79c6>&gt;&gt;&gt;</span> lnglat <span style=color:#ff79c6>=</span> {<span style=color:#f1fa8c>&#39;lng&#39;</span>: g<span style=color:#ff79c6>.</span>lng, <span style=color:#f1fa8c>&#39;lat&#39;</span>: g<span style=color:#ff79c6>.</span>lat}
+<span style=color:#ff79c6>&gt;&gt;&gt;</span> tf <span style=color:#ff79c6>=</span> TimezoneFinder()
+<span style=color:#ff79c6>&gt;&gt;&gt;</span> tz <span style=color:#ff79c6>=</span> pytz<span style=color:#ff79c6>.</span>timezone(tf<span style=color:#ff79c6>.</span>timezone_at(<span style=color:#ff79c6>**</span>lnglat))
+<span style=color:#ff79c6>&gt;&gt;&gt;</span> tz
+<span style=color:#ff79c6>&lt;</span>DstTzInfo <span style=color:#f1fa8c>&#39;Asia/Tokyo&#39;</span> LMT<span style=color:#ff79c6>+</span><span style=color:#bd93f9>9</span>:<span style=color:#bd93f9>19</span>:<span style=color:#bd93f9>00</span> STD<span style=color:#ff79c6>&gt;</span>
+</code></pre></div><p>他にも、<a class=link href="https://cloud.google.com/maps-platform/?hl=ja" target=_blank rel=noopener>Google Maps API</a> で API キーを取得して、Time Zone API を叩くといった方法もあります。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=color:#ff79c6>&gt;&gt;&gt;</span> <span style=color:#ff79c6>import</span> googlemaps
+<span style=color:#ff79c6>&gt;&gt;&gt;</span> client <span style=color:#ff79c6>=</span> googlemaps<span style=color:#ff79c6>.</span>Client(key)
+<span style=color:#ff79c6>&gt;&gt;&gt;</span> result <span style=color:#ff79c6>=</span> client<span style=color:#ff79c6>.</span>timezone((lat, lng))
+<span style=color:#ff79c6>&gt;&gt;&gt;</span> tz <span style=color:#ff79c6>=</span> result[<span style=color:#f1fa8c>&#39;timeZoneId&#39;</span>]
+</code></pre></div><h3 id=utc-を指定する>UTC を指定する</h3>
+<p>最後に、UTC は各ライブラリで特別な方法で指定します。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=color:#ff79c6>&gt;&gt;&gt;</span> tz <span style=color:#ff79c6>=</span> pytz<span style=color:#ff79c6>.</span>utc <span style=color:#6272a4># also: pytz.UTC or timezone.utc</span>
+<span style=color:#ff79c6>&gt;&gt;&gt;</span> tz
+<span style=color:#ff79c6>&lt;</span>UTC<span style=color:#ff79c6>&gt;</span>
+</code></pre></div><h2 id=how-to-use-tzinfo>How to use tzinfo</h2>
+<p>取得した tzinfo (<code>tz</code>) の実際の使い方をまとめます。
+まず、上でどの手法で取得した <code>tz</code> も <code>datetime.tzinfo</code> のサブクラスであることを確認しておきましょう。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=color:#ff79c6>&gt;&gt;&gt;</span> <span style=color:#8be9fd;font-style:italic>isinstance</span>(tz, tzinfo)
+<span style=color:#ff79c6>True</span>
+</code></pre></div><h3 id=日付に応じたタイムゾーンを求める>日付に応じたタイムゾーンを求める</h3>
+<p>夏時間を採用する地域では、日付によってタイムゾーン名と UTC からのオフセット値が変わります。
+tzinfo では以下のメソッドで <code>datetime.datetime</code> オブジェクトを与えることで、日付に応じた値の取得が可能です。
+まずはタイムゾーン名から。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=color:#ff79c6>&gt;&gt;&gt;</span> tz <span style=color:#ff79c6>=</span> pytz<span style=color:#ff79c6>.</span>timezone(<span style=color:#f1fa8c>&#39;Europe/Amsterdam&#39;</span>)
+<span style=color:#ff79c6>&gt;&gt;&gt;</span> tz<span style=color:#ff79c6>.</span>tzname(datetime(<span style=color:#bd93f9>2019</span>, <span style=color:#bd93f9>1</span>, <span style=color:#bd93f9>1</span>))
+<span style=color:#f1fa8c>&#39;CET&#39;</span>
+
+<span style=color:#ff79c6>&gt;&gt;&gt;</span> tz<span style=color:#ff79c6>.</span>tzname(datetime(<span style=color:#bd93f9>2019</span>, <span style=color:#bd93f9>8</span>, <span style=color:#bd93f9>1</span>))
+<span style=color:#f1fa8c>&#39;CEST&#39;</span>
+</code></pre></div><p>次に UTC オフセット値。
+こちらは、<code>datetime.timedelta</code> オブジェクトによって表現されます。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=color:#ff79c6>&gt;&gt;&gt;</span> tz<span style=color:#ff79c6>.</span>utcoffset(datetime(<span style=color:#bd93f9>2019</span>, <span style=color:#bd93f9>1</span>, <span style=color:#bd93f9>1</span>))
+datetime<span style=color:#ff79c6>.</span>timedelta(<span style=color:#bd93f9>0</span>, <span style=color:#bd93f9>3600</span>) <span style=color:#6272a4># UTC+01:00</span>
+
+<span style=color:#ff79c6>&gt;&gt;&gt;</span> tz<span style=color:#ff79c6>.</span>utcoffset(datetime(<span style=color:#bd93f9>2019</span>, <span style=color:#bd93f9>8</span>, <span style=color:#bd93f9>1</span>))
+datetime<span style=color:#ff79c6>.</span>timedelta(<span style=color:#bd93f9>0</span>, <span style=color:#bd93f9>7200</span>) <span style=color:#6272a4># UTC+02:00</span>
+</code></pre></div><h3 id=タイムゾーンを持つ日付を扱う>タイムゾーンを持つ日付を扱う</h3>
+<p>Python の日付は、<code>datetime.datetime</code> に tzinfo を指定しない場合はタイムゾーンを持たない (timezone-naive な) オブジェクト、指定した場合はタイムゾーンを持つ (timezone-aware な) オブジェクトになります。
+例えば、以下のように datetime オブジェクトを作成した場合は timezone-naive となります。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=color:#ff79c6>&gt;&gt;&gt;</span> dt_naive <span style=color:#ff79c6>=</span> datetime(<span style=color:#bd93f9>2019</span>, <span style=color:#bd93f9>1</span>, <span style=color:#bd93f9>1</span>)
+datetime<span style=color:#ff79c6>.</span>datetime(<span style=color:#bd93f9>2019</span>, <span style=color:#bd93f9>1</span>, <span style=color:#bd93f9>1</span>, <span style=color:#bd93f9>0</span>, <span style=color:#bd93f9>0</span>) <span style=color:#6272a4># timezone-naive</span>
+</code></pre></div><p>timezone-aware なオブジェクトは、以下のように <code>localize</code> メソッドに timezone-naive なオブジェクトを与えてあげることで作成します。
+オブジェクトを表示すると、tzinfo が含まれていることが分かります。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=color:#ff79c6>&gt;&gt;&gt;</span> dt_aware <span style=color:#ff79c6>=</span> tz<span style=color:#ff79c6>.</span>localize(dt_naive)
+<span style=color:#ff79c6>&gt;&gt;&gt;</span> dt_aware
+datetime<span style=color:#ff79c6>.</span>datetime(<span style=color:#bd93f9>2019</span>, <span style=color:#bd93f9>1</span>, <span style=color:#bd93f9>1</span>, <span style=color:#bd93f9>0</span>, <span style=color:#bd93f9>0</span>, tzinfo<span style=color:#ff79c6>=&lt;</span>DstTzInfo <span style=color:#f1fa8c>&#39;Europe/Amsterdam&#39;</span> CET<span style=color:#ff79c6>+</span><span style=color:#bd93f9>1</span>:<span style=color:#bd93f9>00</span>:<span style=color:#bd93f9>00</span>STD<span style=color:#ff79c6>&gt;</span>)
+</code></pre></div><p>ちなみに、timezone-aware → timezone-naive の変換は、以下の通りです。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=color:#ff79c6>&gt;&gt;&gt;</span> dt_aware<span style=color:#ff79c6>.</span>replace(tzinfo<span style=color:#ff79c6>=</span><span style=color:#ff79c6>None</span>)
+datetime<span style=color:#ff79c6>.</span>datetime(<span style=color:#bd93f9>2019</span>, <span style=color:#bd93f9>1</span>, <span style=color:#bd93f9>1</span>, <span style=color:#bd93f9>0</span>, <span style=color:#bd93f9>0</span>)
+</code></pre></div><h3 id=タイムゾーンの変換>タイムゾーンの変換</h3>
+<p>timezone-aware なオブジェクトは、<code>astimezone</code> メソッドで他のタイムゾーンを持つオブジェクトに変換することができます。
+例えば、あるタイムゾーンでの時刻が UTC で何時なのかを調べたい場合は、以下のようにします。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=color:#ff79c6>&gt;&gt;&gt;</span> dt_aware<span style=color:#ff79c6>.</span>astimezone(pytz<span style=color:#ff79c6>.</span>utc)
+datetime<span style=color:#ff79c6>.</span>datetime(<span style=color:#bd93f9>2018</span>, <span style=color:#bd93f9>12</span>, <span style=color:#bd93f9>31</span>, <span style=color:#bd93f9>23</span>, <span style=color:#bd93f9>0</span>, tzinfo<span style=color:#ff79c6>=&lt;</span>UTC<span style=color:#ff79c6>&gt;</span>)
+</code></pre></div><p>ちなみに、引数に何も与えないと、マシンのローカルタイムゾーンに変換されるようです。</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#282a36;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=color:#ff79c6>&gt;&gt;&gt;</span> dt_aware<span style=color:#ff79c6>.</span>astimezone()
+datetime<span style=color:#ff79c6>.</span>datetime(<span style=color:#bd93f9>2019</span>, <span style=color:#bd93f9>1</span>, <span style=color:#bd93f9>1</span>, <span style=color:#bd93f9>8</span>, <span style=color:#bd93f9>0</span>, tzinfo<span style=color:#ff79c6>=</span>datetime<span style=color:#ff79c6>.</span>timezone(datetime<span style=color:#ff79c6>.</span>timedelta(<span style=color:#bd93f9>0</span>, <span style=color:#bd93f9>32400</span>), <span style=color:#f1fa8c>&#39;JST&#39;</span>))
+</code></pre></div><h2 id=references>References</h2>
+<ul>
+<li><a class=link href=https://docs.python.org/ja/3/library/datetime.html target=_blank rel=noopener>datetime &mdash; 基本的な日付型および時間型 — Python documentation</a></li>
+<li><a class=link href=https://astropengu.in/blog/18/ target=_blank rel=noopener>Python 製ジオコーディングライブラリ Geocoder を試す - Astropenguin</a></li>
+</ul>
+</section>
+<footer class=article-footer>
+<section class=article-tags>
+<a href=/tags/python/>Python</a>
+<a href=/tags/datetime/>datetime</a>
+<a href=/tags/timezone/>timezone</a>
+</section>
+<section class=article-copyright><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg>
+<span>Licensed under CC BY 4.0</span>
+</section>
+<section class=article-lastmod><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<span>
+Last updated on 2021-08-15 20:00 +0900
+</span>
+</section></footer>
+</article>
+<aside class=related-contents--wrapper>
+<h2 class=section-title>Related contents</h2>
+<div class=related-contents>
+<div class="flex article-list--tile">
+<article>
+<a href=/posts/23/>
+<div class=article-details>
+<h2 class=article-title>Python の setup.py の内容を setup.cfg で管理する</h2>
+</div>
+</a>
+</article>
+<article>
+<a href=/posts/21/>
+<div class=article-details>
+<h2 class=article-title>Python で一時的に関数出力を凍結 (キャッシュ) する</h2>
+</div>
+</a>
+</article>
+<article>
+<a href=/posts/20/>
+<div class=article-details>
+<h2 class=article-title>IPython/Jupyter の設定も pipenv で管理する</h2>
+</div>
+</a>
+</article>
+<article>
+<a href=/posts/18/>
+<div class=article-details>
+<h2 class=article-title>Python 製ジオコーディングライブラリ Geocoder を試す</h2>
+</div>
+</a>
+</article>
+<article>
+<a href=/posts/10/>
+<div class=article-details>
+<h2 class=article-title>Python のコンテキストマネージャを使った複数行の時間計測</h2>
+</div>
+</a>
+</article>
+</div>
+</div>
+</aside>
+<footer class=site-footer>
+<section class=copyright>
+&copy;
+2018 -
+2021 astropenguin
+</section>
+<section class=powerby>
+Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> <br>
+Theme <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.1.0>Stack</a></b> designed by <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a>
+</section>
+</footer>
+<div class=pswp tabindex=-1 role=dialog aria-hidden=true>
+<div class=pswp__bg></div>
+<div class=pswp__scroll-wrap>
+<div class=pswp__container>
+<div class=pswp__item></div>
+<div class=pswp__item></div>
+<div class=pswp__item></div>
+</div>
+<div class="pswp__ui pswp__ui--hidden">
+<div class=pswp__top-bar>
+<div class=pswp__counter></div>
+<button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+<div class=pswp__preloader>
+<div class=pswp__preloader__icn>
+<div class=pswp__preloader__cut>
+<div class=pswp__preloader__donut></div>
+</div>
+</div>
+</div>
+</div>
+<div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+<div class=pswp__share-tooltip></div>
+</div>
+<button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+</button>
+<div class=pswp__caption>
+<div class=pswp__caption__center></div>
+</div>
+</div>
+</div>
+</div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.css integrity="sha256-c0uckgykQ9v5k+IqViZOZKc47Jn7KQil4/MP3ySA3F8=" crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.css integrity="sha256-SBLU4vv6CA6lHsZ1XyTdhyjJxCjPif/TRkjnsyGAGnE=" crossorigin=anonymous>
+</main>
+</div>
+<script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.5/dist/vibrant.min.js integrity="sha256-5NovOZc4iwiAWTYIFiIM7DxKUXKWvpVEuMEPLzcm5/g=" crossorigin=anonymous defer></script><script type=text/javascript src=/ts/main.js defer></script>
+<script>(function(){const a=document.createElement('link');a.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",a.type="text/css",a.rel="stylesheet",document.head.appendChild(a)})()</script>
+</body>
+</html>
